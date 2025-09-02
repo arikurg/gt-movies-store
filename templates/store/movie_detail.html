@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <img src="{{ movie.image.url }}" class="img-fluid rounded" alt="{{ movie.title }}">
+    </div>
+    <div class="col-md-8">
+        <h1>{{ movie.title }}</h1>
+        <p class="lead">${{ movie.price }}</p>
+        <p>{{ movie.description }}</p>
+        <a href="{% url 'add_to_cart' movie.id %}" class="btn btn-primary">Add to Cart</a>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<div class="row">
+    <div class="col-md-7">
+        <h3>Reviews</h3>
+        {% for review in reviews %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <p class="card-text">"{{ review.comment }}"</p>
+                    <footer class="blockquote-footer">
+                        {{ review.user.username }} on {{ review.created_at|date:"F d, Y" }}
+                        {% if user == review.user %}
+                            <a href="{% url 'review_edit' review.pk %}" class="btn btn-sm btn-secondary ms-2">Edit</a>
+                            <a href="{% url 'review_delete' review.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                        {% endif %}
+                    </footer>
+                </div>
+            </div>
+        {% empty %}
+            <p>No reviews yet. Be the first to write one!</p>
+        {% endfor %}
+    </div>
+    <div class="col-md-5">
+        {% if user.is_authenticated %}
+            <h3>Write a Review</h3>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-success">Submit Review</button>
+            </form>
+        {% else %}
+            <p><a href="{% url 'login' %}?next={{ request.path }}">Log in</a> to write a review.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

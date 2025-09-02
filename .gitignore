@@ -1,0 +1,19 @@
+# .gitignore
+
+# Python
+__pycache__/
+*.pyc
+
+# Django
+*.log
+db.sqlite3
+media/
+
+# Environment
+venv/
+.env
+
+# IDE / OS files
+.idea/
+.vscode/
+.DS_Store
