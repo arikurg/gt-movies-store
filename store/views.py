@@ -6,6 +6,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Movie, Review, Order, OrderItem
 from .forms import CustomUserCreationForm, ReviewForm
+from django.views.decorators.http import require_POST
 
 # General Views
 def home(request):
@@ -21,7 +22,7 @@ def movie_list(request):
 
 def movie_detail(request, pk):
     movie = get_object_or_404(Movie, pk=pk)
-    reviews = movie.reviews.all() # US 12
+    reviews = movie.reviews.filter(is_reported=False)
     if request.method == 'POST':
         if not request.user.is_authenticated:
             return redirect('login')
@@ -35,6 +36,15 @@ def movie_detail(request, pk):
     else:
         form = ReviewForm()
     return render(request, 'store/movie_detail.html', {'movie': movie, 'reviews': reviews, 'form': form}) # US 13
+
+@login_required
+@require_POST # This ensures only POST requests can access this view
+def report_review(request, pk):
+    review = get_object_or_404(Review, pk=pk)
+    review.is_reported = True
+    review.save()
+    # Redirect back to the movie detail page. The review will now be hidden.
+    return redirect('movie_detail', pk=review.movie.pk)
 
 # User Authentication
 class SignUpView(CreateView):

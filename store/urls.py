@@ -9,6 +9,7 @@ urlpatterns = [
     
     path('review/<int:pk>/edit/', views.ReviewUpdateView.as_view(), name='review_edit'),
     path('review/<int:pk>/delete/', views.ReviewDeleteView.as_view(), name='review_delete'),
+    path('review/<int:pk>/report/', views.report_review, name='report_review'),
 
     path('cart/', views.view_cart, name='view_cart'),
     path('cart/add/<int:movie_id>/', views.add_to_cart, name='add_to_cart'),

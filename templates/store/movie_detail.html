@@ -22,11 +22,19 @@
                 <div class="card-body">
                     <p class="card-text">"{{ review.comment }}"</p>
                     <footer class="blockquote-footer">
+                    </div>
                         {{ review.user.username }} on {{ review.created_at|date:"F d, Y" }}
                         {% if user == review.user %}
                             <a href="{% url 'review_edit' review.pk %}" class="btn btn-sm btn-secondary ms-2">Edit</a>
                             <a href="{% url 'review_delete' review.pk %}" class="btn btn-sm btn-danger">Delete</a>
                         {% endif %}
+                    </div>
+                    {% if user.is_authenticated and user != review.user %}
+                    <form action="{% url 'report_review' review.pk %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-warning">Report</button>
+                    </form>
+                    {% endif %}
                     </footer>
                 </div>
             </div>
