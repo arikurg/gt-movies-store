@@ -29,7 +29,7 @@
                             <a href="{% url 'review_delete' review.pk %}" class="btn btn-sm btn-danger">Delete</a>
                         {% endif %}
                     </div>
-                    {% if user.is_authenticated and user != review.user %}
+                    {% if user.is_authenticated %}
                     <form action="{% url 'report_review' review.pk %}" method="post" class="d-inline">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-sm btn-warning">Report</button>
