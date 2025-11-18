@@ -1,11 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator # Import validators
+from django.db.models import Avg
 
 class Movie(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
     image = models.ImageField(upload_to='movie_images/', null=True, blank=True)
+
+    def average_rating(self):
+        ratings = self.ratings.all().aggregate(Avg('value'))['value__avg']
+        return round(ratings, 1) if ratings else 0
     
     def __str__(self):
         return self.title
@@ -36,3 +42,18 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f'{self.quantity} of {self.movie.title}'
+    
+
+class Rating(models.Model):
+    movie = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name='ratings')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    value = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'movie') # Ensures a user can only rate a movie once
+
+    def __str__(self):
+        return f'{self.user.username} rated {self.movie.title} {self.value}/5'

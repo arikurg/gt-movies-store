@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Movie, Review, Order, OrderItem
+from .models import Movie, Review, Order, OrderItem, Rating
 from .forms import CustomUserCreationForm, ReviewForm
 from django.views.decorators.http import require_POST
 
@@ -131,3 +131,19 @@ def order_history(request): # US 14
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'store/order_history.html', {'orders': orders})
 # Create your views here.
+
+
+@login_required
+@require_POST
+def rate_movie(request, pk):
+    movie = get_object_or_404(Movie, pk=pk)
+    rating_value = request.POST.get('rating')
+
+    if rating_value:
+        Rating.objects.update_or_create(
+            user=request.user,
+            movie=movie,
+            defaults={'value': int(rating_value)}
+        )
+
+    return redirect('movie_detail', pk=pk)

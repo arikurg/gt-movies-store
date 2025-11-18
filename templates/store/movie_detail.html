@@ -12,6 +12,33 @@
     </div>
 </div>
 
+<div class="mb-3">
+    <h3>
+        Rating: {{ movie.average_rating }} / 5 
+        <small class="text-muted">({{ movie.ratings.count }} votes)</small>
+    </h3>
+</div>
+
+{% if user.is_authenticated %}
+    <form action="{% url 'rate_movie' movie.pk %}" method="post" class="mb-4">
+        {% csrf_token %}
+        <label class="form-label">Rate this movie:</label>
+        <div class="input-group" style="max-width: 300px;">
+            <select name="rating" class="form-select">
+                <option value="" selected disabled>Choose...</option>
+                <option value="5">5 Stars - Excellent</option>
+                <option value="4">4 Stars - Very Good</option>
+                <option value="3">3 Stars - Good</option>
+                <option value="2">2 Stars - Fair</option>
+                <option value="1">1 Star - Poor</option>
+            </select>
+            <button type="submit" class="btn btn-outline-primary">Submit</button>
+        </div>
+    </form>
+{% else %}
+    <p><a href="{% url 'login' %}">Log in</a> to rate this movie.</p>
+{% endif %}
+
 <hr class="my-5">
 
 <div class="row">
