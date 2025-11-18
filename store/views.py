@@ -4,8 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .models import Movie, Review, Order, OrderItem, Rating
-from .forms import CustomUserCreationForm, ReviewForm
+from .models import Movie, Review, Order, OrderItem, Rating, Profile
+from .forms import CustomUserCreationForm, ReviewForm, ProfileUpdateForm
 from django.views.decorators.http import require_POST
 
 # General Views
@@ -147,3 +147,25 @@ def rate_movie(request, pk):
         )
 
     return redirect('movie_detail', pk=pk)
+
+
+@login_required
+def profile_view(request):
+    # Ensure a profile exists for the user (handles first-time access)
+    profile, created = Profile.objects.get_or_create(user=request.user)
+    
+    if request.method == 'POST':
+        # The request.FILES argument is CRITICAL for file uploads
+        p_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
+        
+        if p_form.is_valid():
+            p_form.save()
+            return redirect('profile') # Redirect to prevent resubmission
+    else:
+        p_form = ProfileUpdateForm(instance=profile)
+
+    context = {
+        'p_form': p_form,
+        'profile': profile
+    }
+    return render(request, 'store/profile.html', context)

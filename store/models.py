@@ -57,3 +57,12 @@ class Rating(models.Model):
 
     def __str__(self):
         return f'{self.user.username} rated {self.movie.title} {self.value}/5'
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # The ImageField stores the file path.
+    # We use a default image in case the user doesn't upload one.
+    image = models.ImageField(default='profile_pics/default.jpg', upload_to='profile_pics/')
+
+    def __str__(self):
+        return f'{self.user.username} Profile'
